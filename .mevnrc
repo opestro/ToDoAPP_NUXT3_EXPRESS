@@ -6,6 +6,6 @@
   "deployTarget": "server",
   "isConfigured": {
     "client": false,
-    "server": false
+    "server": true
   }
 }
