@@ -80,10 +80,10 @@ router.post('/logout', (req, res) => {
 });
 
 // Note routes
-router.post('/note', isAuthenticated, (req, res) => {
+router.post('/note', isAuthenticated, createNote, (req, res) => {
   
   try {
-    createNote()
+    
     res.status(200);
   }
   catch (error) {
