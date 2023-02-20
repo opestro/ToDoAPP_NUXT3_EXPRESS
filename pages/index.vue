@@ -60,11 +60,11 @@ export default {
         }
     },
     created() {
+       
         const user = authUser.user
         if (user) {
             this.name = user.full_name
             this.isLogin = true
-
         }
 
     },

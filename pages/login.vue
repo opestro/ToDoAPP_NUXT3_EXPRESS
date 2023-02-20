@@ -35,6 +35,7 @@ definePageMeta({
 })
 export default {
 
+
     data() {
         return {
             username: '',
@@ -50,7 +51,7 @@ export default {
                 "username": this.username,
                 "password": this.password
             }).then((data) => {
-               // console.log(data)
+                console.log(data)
                 localStorage.setItem('token', data.data.token)
                 axios.get('http://localhost:9000/api/user/profile', { headers: { 'authorization': data.data.token } })
                     .then((data) => {
@@ -59,11 +60,13 @@ export default {
                             username: data.data.username,
                             $id: data.data.userId
                         }
-                 //       console.log(userData)
+                        //       console.log(userData)
                         authUser.setData(userData)
                         this.$router.push('/')
                     }).catch((err) => { console.log(err) });
-            }).catch((err) => { this.isCorrect = false });
+            }).catch((err) => {
+                console.log(err)
+                this.isCorrect = false });
         }
     },
 }
