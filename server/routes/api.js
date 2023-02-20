@@ -1,30 +1,34 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const User = require('../../models/user_schema');
+const User = require('../models/user_schema');
 const jwt = require('jsonwebtoken');
 const { isAuthenticated } = require('../middleware/auth');
 const blacklist = new Set();
-// const
 const {
   createData,
   readData,
   updateData,
   deleteData,
 } = require('../controllers/user_controller');
+const {
+  createNote,
+  readNote,
+  updateNote,
+  deleteNote, } = require('../controllers/note_controller');
 
 const router = express.Router();
 
 // Signup routes
 router
-  .post('/signup', createData, (req, res) =>{
-    try{
+  .post('/signup', createData, (req, res) => {
+    try {
       res.status(200);
     }
-      catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Internal server error' });
-      }
-    
+    catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+
   });
 
 
@@ -55,7 +59,7 @@ router.get('/user/profile', isAuthenticated, async (req, res) => {
     if (!user) {
       res.status(404).send('User not found');
     } else {
-      res.status(200).json({ full_name : user.full_name ,username : user.username, userId: user._id });
+      res.status(200).json({ full_name: user.full_name, username: user.username, userId: user._id });
     }
   } catch (err) {
     res.status(500).send(err.message);
@@ -74,6 +78,22 @@ router.post('/logout', (req, res) => {
   }
   res.sendStatus(400);
 });
+
+// Note routes
+router.post('/note', isAuthenticated, (req, res) => {
+  
+  try {
+    createNote()
+    res.status(200);
+  }
+  catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+router.get('/notes', isAuthenticated, readNote ,(req, res) => {
+  })
+
 
 
 module.exports = router;

@@ -1,6 +1,6 @@
 'use strict';
 
-const User = require('../../models/user_schema');
+const User = require('../models/user_schema');
 
 const createData = (req, res) => {
   User.create(req.body)
