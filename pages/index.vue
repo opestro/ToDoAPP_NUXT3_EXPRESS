@@ -20,24 +20,28 @@
             </button>
         </addNewNote>
         <!-- Your notes -->
-        <div v-if="isLogin" v-for="notes in user.notes" :key="notes" class="flex justify-center">
-            <div class="card card-body card-bordered  items-center w-full max-w-sm">
-                <div>
-                    <h1 class=" card-title w-full "> {{ notes.note }}</h1>
+        <div class=" "> 
+            <div  class="  columns-4 ">
+                <div v-for="notes in user.notes" :key="notes"  class="flex justify-center">
+                  
+                        <div class="card card-body collapse h-full card-bordered m-2 items-center w-full max-w-sm">
+                            <div>
+                                <h1 class=" card-title w-full  "> {{ notes.note }}</h1>
+                            </div>
+                            <button class="btn btn-square btn-error w-full max-w-xs btn-outline">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                       
+                    </div>
+    
                 </div>
-                <button v-if="!notes.isDone" class="btn btn-success w-full max-w-xs hover:shadow-sm rounded-md shadow-md ">
-                    Done
-                </button>
-                <button v-if="notes.isDone" class="btn btn-error w-full max-w-xs hover:shadow-sm rounded-md shadow-md ">
-                    Not yet
-                </button>
-                <button class="btn btn-square btn-error w-full max-w-xs btn-outline">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
+        </div>
+        
+
         </div>
         <div class=" card-body items-center">
             <button v-if="isLogin" class="btn w-full max-w-sm btn-error" @click="logout()"> Logout</button>
@@ -70,7 +74,7 @@ export default {
                 isDone: false,
             },
             isLogin: false,
-            token : '',
+            token: '',
 
         }
     },
@@ -84,12 +88,13 @@ export default {
         this.user._id = user.$id
         this.token = localStorage.getItem('token')
         console.log(user.$id)
-        axios.get('http://localhost:9000/api/notes', {
-            headers: { 'authorization': this.token }
+        $fetch('http://localhost:9000/api/notes', {
+            method: 'GET',
+            headers: { 'authorization': this.token },
         })
             .then((data) => {
-                this.user.notes = data.data
-                console.log(data.data)
+                this.user.notes = data
+                console.log(data)
             })
             .catch((error) => { });
     },
@@ -103,12 +108,22 @@ export default {
             }).catch((err) => { console.log(err) });
         },
         createNote() {
-            axios.post('http://localhost:9000/api/note', {
-                headers: { authorization: this.token }
+            $fetch('http://localhost:9000/api/note', {
+                method: 'POST',
+                headers: { 'authorization': this.token },
+                body: {
+                    user_id: this.user._id,
+                    note: this.newNote.note,
+                    isDone: this.newNote.isDone
+                }
             }).then((data) => {
+                console.log("data")
                 this.user.notes.push({ note: this.newNote.note, isDone: this.newNote.isDone })
-                
+
             }).catch((err) => { console.log(err) });
+        },
+        deleteNote() {
+
         }
     },
 }
