@@ -1,6 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const User = require('../models/user_schema');
+const User = require('../../models/user_schema');
 const jwt = require('jsonwebtoken');
 const { isAuthenticated } = require('../middleware/auth');
 const blacklist = new Set();
