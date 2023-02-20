@@ -4,7 +4,7 @@
         <bigHead class="text-center card card-body items-center">
 
             <h2 v-if="isLogin" class=" ">
-                Welcome back <h1 class=" text-2xl text-white capitalize">{{ name }}</h1> to your
+                Welcome back <h1 class=" text-2xl text-white capitalize">{{ user.name }}</h1> to your
             </h2>
 
             <h1 class=" text-4xl card-title">
@@ -13,20 +13,23 @@
         </bigHead>
         <!-- Add new note -->
         <addNewNote v-if="isLogin" class=" flex justify-center  my-5">
-            <input class="input input-secondary input-bordered shadow-sm border focus:border-0 mx-2 rounded-lg "
-                type="text">
-            <button class="btn btn-secondary ">
+            <input class="input input-secondary input-bordered shadow-sm border focus:border-0 mx-2 rounded-lg " type="text"
+                v-model="newNote.note">
+            <button class="btn btn-secondary " @click="createNote()">
                 ADD
             </button>
         </addNewNote>
         <!-- Your notes -->
-        <div v-if="isLogin" class="flex justify-center">
+        <div v-if="isLogin" v-for="notes in user.notes" :key="notes" class="flex justify-center">
             <div class="card card-body card-bordered  items-center w-full max-w-sm">
                 <div>
-                    <h1 class=" card-title w-full "> testtt ttsts tststs stst tstst stst</h1>
+                    <h1 class=" card-title w-full "> {{ notes.note }}</h1>
                 </div>
-                <button class="btn btn-success w-full max-w-xs hover:shadow-sm rounded-md shadow-md ">
+                <button v-if="!notes.isDone" class="btn btn-success w-full max-w-xs hover:shadow-sm rounded-md shadow-md ">
                     Done
+                </button>
+                <button v-if="notes.isDone" class="btn btn-error w-full max-w-xs hover:shadow-sm rounded-md shadow-md ">
+                    Not yet
                 </button>
                 <button class="btn btn-square btn-error w-full max-w-xs btn-outline">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -48,33 +51,63 @@
 import { authStore } from '@/store/auth'
 import axios from 'axios'
 const authUser = authStore()
+const user = authUser.user
+
 definePageMeta({
     middleware: 'auth'
 })
 export default {
     data() {
         return {
-            name: '',
+            user: {
+                name: '',
+                _id: '',
+                notes: '',
+                isDone: ''
+            },
+            newNote: {
+                note: '',
+                isDone: false,
+            },
             isLogin: false,
+            token : '',
 
         }
     },
     created() {
-       
-        const user = authUser.user
         if (user) {
-            this.name = user.full_name
+            this.user.name = user.full_name
             this.isLogin = true
         }
-
+    },
+    mounted() {
+        this.user._id = user.$id
+        this.token = localStorage.getItem('token')
+        console.log(user.$id)
+        axios.get('http://localhost:9000/api/notes', {
+            headers: { 'authorization': this.token }
+        })
+            .then((data) => {
+                this.user.notes = data.data
+                console.log(data.data)
+            })
+            .catch((error) => { });
     },
     methods: {
         logout() {
-            const token = localStorage.getItem('token')
+
             // console.log(token)
-            axios.post('http://localhost:9000/api/logout', { "token": token }).then((data) => {
+            axios.post('http://localhost:9000/api/logout', { "token": this.token }).then((data) => {
                 localStorage.removeItem('token')
                 this.$router.push('/login')
+            }).catch((err) => { console.log(err) });
+        },
+        createNote() {
+            axios.post('http://localhost:9000/api/note', {
+                headers: { authorization: this.token }
+            }).then((data) => {
+                this.user.notes.push({ note: this.newNote.note, isDone: this.newNote.isDone })
+                
             }).catch((err) => { console.log(err) });
         }
     },
